@@ -1,0 +1,36 @@
+Here are tools and approaches (not WikiExtractor) for reading, decompressing, and processing Wikipedia .bz2 dumps:
+
+1) bz2 + streaming XML parsers (lightweight, flexible)
+- Use system bzip2 or Python's builtin bz2 to stream-decompress and pipe to a streaming XML parser (SAX or iterparse).
+- Recommended libs: Python: bz2.open() + lxml.iterparse or xml.etree.ElementTree.iterparse; Java: Apache Commons Compress + StAX; Go: compress/bzip2 + encoding/xml.
+- Good when you want custom, memory‑efficient processing of <page> elements.
+
+2) mwxml / mwxmlreader (Python)
+- Purpose-built readers for MediaWiki dump XML: iterate pages/revisions, handle redirects and namespaces.
+- Works on .bz2 input streams; lower-level than WikiExtractor and keeps structure (wikitext, metadata).
+
+3) mwxml (Rust) and mediawiki-parser crates
+- Rust crates offer fast, memory-safe parse of dumps; suitable for high-performance pipelines.
+
+4) wikimedia-dumps-tools (command-line)
+- Official tools and scripts from Wikimedia for handling dump files (download, verify, decompress), often used in pipelines before parsing.
+
+5) WikiMediaTools / dump2sql / mwdumper (Java)
+- mwdumper: Java-based tool to convert XML dumps to SQL import files or to iterate pages; can read .bz2 directly.
+- Useful if you need SQL-compatible outputs or to import into MediaWiki DB schemas.
+
+6) Kiwix tools (zim extraction)
+- If your target is ZIM or offline reading, Kiwix utilities can convert dumps and produce searchable archives.
+
+7) Custom pipeline with streaming tools (recommended for large-scale)
+- Step 1: decompress stream: bzip2 -dc enwiki-latest-pages-articles.xml.bz2
+- Step 2: pipe to a SAX/iterparse program that extracts <page>/<revision>/<text> and writes desired output (JSONL, sqlite, Parquet).
+- Use multiprocessing or chunking to scale.
+
+Quick picks by need:
+- Fast, production: mwdumper (Java) or Rust mwxml.
+- Python ecosystem & flexibility: mwxmlreader or bz2.open() + lxml.iterparse.
+- Convert to SQL/import: mwdumper / dump2sql.
+- Offline ZIM creation: Kiwix tools.
+
+If you tell me your preferred language (Python, Java, Rust, Go) and desired output (plain text, JSONL, SQL, Parquet), I’ll give a minimal example command or code snippet.
